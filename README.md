@@ -4,6 +4,9 @@ A simple way to notify your user about the connection status.
 
 ## Gallery
 
+![android_sample](https://user-images.githubusercontent.com/52869694/152056061-193a6a69-dbdd-48e0-bc10-892723b59478.gif)
+![ios_sample](https://user-images.githubusercontent.com/52869694/152056087-92ae2fa1-3ff0-419d-abdd-50e699957bb1.gif)
+
 
 #### Basic Usage: ConnectionNotifier
 
