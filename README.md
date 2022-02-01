@@ -79,9 +79,9 @@ ConnectionNotifierToggler(
 
 This package depends on the following (Big Thanks):
 
-<br [flutter_bloc](https://github.com/felangel/bloc/tree/master/packages/flutter_bloc)/>
-<br [oktoast](https://github.com/OpenFlutter/flutter_oktoast)/>
-<br [internet_connection_checker ](https://github.com/RounakTadvi/internet_connection_checker)/>
+[flutter_bloc](https://github.com/felangel/bloc/tree/master/packages/flutter_bloc) <br />
+[oktoast](https://github.com/OpenFlutter/flutter_oktoast) <br />
+[internet_connection_checker ](https://github.com/RounakTadvi/internet_connection_checker) <br />
 
 
 ## License
