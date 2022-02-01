@@ -4,11 +4,14 @@ A simple way to notify your user about the connection status.
 
 ## Gallery
 
-![android_sample](https://user-images.githubusercontent.com/52869694/152056061-193a6a69-dbdd-48e0-bc10-892723b59478.gif)
 
-
-https://user-images.githubusercontent.com/52869694/152056865-b30b6c46-5c93-425d-ba34-a582aa79d91f.mp4
-
+<table>
+  <tr>
+    <td><img src="https://user-images.githubusercontent.com/52869694/152056061-193a6a69-dbdd-48e0-bc10-892723b59478.gif" width=270 height=480></td>
+    <td><img src="https://user-images.githubusercontent.com/52869694/152057700-71f9cccf-3fe0-435d-92c2-e20cddf6a7a3.gif" width=270 height=480></td>
+  </tr>
+ </table>
+      
 
 
 #### Basic Usage: ConnectionNotifier
@@ -76,9 +79,9 @@ ConnectionNotifierToggler(
 
 This package depends on the following (Big Thanks):
 
-[flutter_bloc](https://github.com/felangel/bloc/tree/master/packages/flutter_bloc)
-[oktoast](https://github.com/OpenFlutter/flutter_oktoast)
-[internet_connection_checker ](https://github.com/RounakTadvi/internet_connection_checker)
+<br[flutter_bloc](https://github.com/felangel/bloc/tree/master/packages/flutter_bloc)/>
+<br[oktoast](https://github.com/OpenFlutter/flutter_oktoast)/>
+<br[internet_connection_checker ](https://github.com/RounakTadvi/internet_connection_checker)/>
 
 
 ## License
