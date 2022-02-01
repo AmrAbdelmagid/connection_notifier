@@ -68,7 +68,7 @@ ConnectionNotifierToggler(
       );
 
 ```
-#### Check Anywhere inside UI for internet connection 
+#### Check anywhere inside UI for internet connection 
 
 ```dart
  ConnectionNotifierManager.isConnected(context); // you need to check if it is null (it will be null in initialization phase only).
