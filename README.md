@@ -1,6 +1,6 @@
 # Connection Notifier
 
-A simple way to notify your user about the connection status.
+A simple way to notify your user about the connection status as well as providing simple tools that help tracking the internet connection status.
 
 ## Gallery
 
@@ -13,8 +13,7 @@ A simple way to notify your user about the connection status.
  </table>
       
 
-
-#### Basic Usage: ConnectionNotifier
+### ConnectionNotifier
 
 ```dart
 class MyApp extends StatelessWidget {
@@ -22,7 +21,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ConnectionNotifier(    /// Wrap [MaterialApp] with [ConnectionNotifier], and that is it!
+    /// Wrap [MaterialApp] with [ConnectionNotifier], and that is it!
+    return ConnectionNotifier( 
       child: MaterialApp(
         title: 'Connection Notifier Demo',
         theme: ThemeData(
@@ -34,6 +34,45 @@ class MyApp extends StatelessWidget {
   }
 }
 ```
+#### ConnectionNotifier parameters catalog
+---
+
+| Option | Description | Type | Default Value | Required |
+|---|---|---|---|:---:|
+child | Child widget, typically [MaterialApp] or [CupertinoApp] | Widget | - |Yes
+alignment | Alignment of the connection notification | AlignmentGeometry | AlignmentDirectional.topCenter |No
+pauseConnectionListenerWhenAppInBackground | To pause listening to changes while app in background | bool | false |No
+height | Height of the connection notification | double? | twice top padding |No
+width | Width of the connection notification | double? | double.infinity |No
+borderRadius | Border radius of the connection notification | BorderRadiusGeometry? | null |No
+connectedBackgroundColor | Background color of the connection notification in connected state | Color? | Colors.green |No
+disconnectedBackgroundColor | Background color of the connection notification in disconnected state | Color? | Colors.red |No
+connectedDuration | Duration of the connection notification in connected state before it's auto dismissing | Duration? | 2 seconds |No
+disconnectedDuration | Duration of the connection notification in disconnected state before it's auto dismissing | Duration? | infinity |No
+overlayAnimationType | Overlay animation type of the connection notification | OverlayAnimationType | OverlayAnimationType.fadeAndSlide |No
+animationCurve | Animation curve of the connection notification | Curve? | Curves.fastOutSlowIn |No
+animationDuration | Animation duration of the connection notification | Duration? | 300 milliseconds |No
+locale | Mirror of MaterialApp [locale] property | Locale? | null |No
+supportedLocales | Mirror of MaterialApp [supportedLocales] property | Iterable<Locale>? | null |No
+localizationsDelegates | Mirror of MaterialApp [localizationsDelegates] property | Iterable<LocalizationsDelegate<dynamic>>? | null |No
+localeListResolutionCallback | Mirror of MaterialApp [localeListResolutionCallback] property | Locale? Function(List<Locale>?, Iterable<Locale>)? | null |No
+localeResolutionCallback | Mirror of MaterialApp [localeResolutionCallback] property | Locale? Function(Locale?, Iterable<Locale>)? | null |No
+connectedContent | Content of connection notification in connected state. if this is given, it will override all the specific parameters for the default content in connected state, typically a [Row] widget | Widget? | null |No
+disconnectedContent | Content of connection notification in disconnected state. if this is given, it will override all the specific parameters for the default content in disconnected state, typically a [Row] widget | Widget? | null |No
+shouldAlwaysPullContentDownOnTopAlignment | If the content of the connection notification should be pulled down in case of top alignment and [height] is grater than twice of top padding only, to test it visually just set a [height] that is bigger than twice of top padding (300 for example) and toggle it between [true] and [false] to see it's effect | bool | true |No
+hasIndicationIcon | If the default content has an indication icon | bool | true |No
+textAndIconSeparationWidth | Distance between text and icon in default content | double? | 10 |No
+connectedText | Text of the default content of the connection notification in connected state | String? | 'Back Online' |No
+disconnectedText | Text of the default content of the connection notification in disconnected state | String? | 'Retrying' |No
+connectedTextStyle | Text style of the default content of the connection notification in connected state | String? | null |No
+disconnectedTextStyle | Text style of the default content of the connection notification in disconnected state | String? | null |No
+connectedIcon | Icon of the default content of the connection notification in connected state | Icon? | Icon widget with [Icons.check] |No
+disconnectedIcon | Icon of the default content of the connection notification in disconnected state | Icon? | Circular progress indicator |No
+iconBoxSideLength | Length of each side (height and width) of the [SizedBox] that wraps the [Icon] of the default content of the connection notification | double? | 10 |No
+connectedConnectionNotification | This is useful if you want to override default connection notification with a custom widget in connected state and it will use the alignment and animation | Widget? | null |No
+disconnectedConnectionNotification | This is useful if you want to override default connection notification with a custom widget in disconnected state and it will use the alignment and animation | Widget? | null |No
+---
+
 #### ConnectionNotifierToggler
 
 If you want to toggle between some widgets automatically based on connection state.
@@ -68,20 +107,35 @@ ConnectionNotifierToggler(
       );
 
 ```
-#### Check anywhere inside UI for internet connection 
+---
+#### ConnectionNotifierTools
+
+Tools that make it very easy to check on the internet connection status ANY WHERE inside your project.
+
+At first you need to initialize it before using it's data. To do that, simply call this:
 
 ```dart
- ConnectionNotifierManager.isConnected(context); // you need to check if it is null (it will be null in initialization phase only).
+  await ConnectionNotifierTools.initialize();
 ```
+Then you can use these tools as you want:
+
+```dart
+ /// A boolean that has the latest update about the connection status
+ ConnectionNotifierTools.isConnected;
+
+ /// A broadcast stream that emits on every change in the connection status. 
+ ConnectionNotifierTools.onStatusChange;
+```
+
+And that's it!
 
 
 ## Attribution
 
 This package depends on the following (Big Thanks):
 
-[flutter_bloc](https://github.com/felangel/bloc/tree/master/packages/flutter_bloc) <br />
-[oktoast](https://github.com/OpenFlutter/flutter_oktoast) <br />
-[internet_connection_checker ](https://github.com/RounakTadvi/internet_connection_checker) <br />
+[internet_connection_checker](https://github.com/RounakTadvi/internet_connection_checker) <br />
+[rxdart](https://github.com/ReactiveX/rxdart) <br />
 
 
 ## License

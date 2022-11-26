@@ -1,3 +1,6 @@
 library connection_notifier;
 
-export 'src/manager/connection_notifier_manager.dart';
+export 'src/core/manager/connection_notifier_tools.dart';
+export 'src/widgets/connection_notifier_toggler.dart';
+export 'src/widgets/connection_notifier/connection_notifier.dart';
+export 'src/widgets/connection_status_overlay/overlay_animation_type.dart';

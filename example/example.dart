@@ -1,7 +1,10 @@
-import 'package:flutter/material.dart';
 import 'package:connection_notifier/connection_notifier.dart';
+import 'package:flutter/material.dart';
 
-void main() {
+void main() async {
+  /// If you want to use [ConnectionNotifierTools] you must call this first.
+  // await ConnectionNotifierTools.initialize();
+
   runApp(const MyApp());
 }
 
@@ -10,28 +13,19 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ConnectionNotifier(
-      /// Wrap [MaterialApp] with [ConnectionNotifier]
+    /// Wrap [MaterialApp] with [ConnectionNotifier], and that is it!
+    return const ConnectionNotifier(
+      alignment: AlignmentDirectional.bottomCenter,
       child: MaterialApp(
         title: 'Connection Notifier Demo',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-        ),
-        home: const MyHomePage(),
+        home: MyHomePage(),
       ),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
+class MyHomePage extends StatelessWidget {
   const MyHomePage({Key? key}) : super(key: key);
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  String? connectionType;
 
   @override
   Widget build(BuildContext context) {
@@ -59,11 +53,14 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
         disconnected: Center(
           key: UniqueKey(),
-          child: const Text(
-            'Disconnected',
-            style: TextStyle(
-              color: Colors.red,
-              fontSize: 48,
+          child: TextButton(
+            onPressed: () {},
+            child: const Text(
+              'Disconnected',
+              style: TextStyle(
+                color: Colors.red,
+                fontSize: 48,
+              ),
             ),
           ),
         ),
