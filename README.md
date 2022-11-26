@@ -10,6 +10,9 @@ A simple way to notify your user about the connection status as well as providin
     <td><img src="https://user-images.githubusercontent.com/52869694/152056061-193a6a69-dbdd-48e0-bc10-892723b59478.gif" width=270 height=480></td>
     <td><img src="https://user-images.githubusercontent.com/52869694/152057700-71f9cccf-3fe0-435d-92c2-e20cddf6a7a3.gif" width=240 height=480></td>
   </tr>
+    <tr>
+    <td><img src="https://user-images.githubusercontent.com/52869694/204103379-2b83ab1b-d9e8-4e82-a98c-5afd60b6a084.gif" width=230 height=480></td>
+  </tr>
  </table>
       
 
@@ -71,7 +74,7 @@ disconnectedIcon | Icon of the default content of the connection notification in
 iconBoxSideLength | Length of each side (height and width) of the [SizedBox] that wraps the [Icon] of the default content of the connection notification | double? | 10 |No
 connectedConnectionNotification | This is useful if you want to override default connection notification with a custom widget in connected state and it will use the alignment and animation | Widget? | null |No
 disconnectedConnectionNotification | This is useful if you want to override default connection notification with a custom widget in disconnected state and it will use the alignment and animation | Widget? | null |No
----
+
 
 #### ConnectionNotifierToggler
 
