@@ -37,7 +37,7 @@ class MyApp extends StatelessWidget {
   }
 }
 ```
-#### ConnectionNotifier parameters catalog
+#### ConnectionNotificationOptions parameters catalog
 ---
 
 | Option | Description | Type | Default Value | Required |
@@ -55,11 +55,6 @@ disconnectedDuration | Duration of the connection notification in disconnected s
 overlayAnimationType | Overlay animation type of the connection notification | OverlayAnimationType | OverlayAnimationType.fadeAndSlide |No
 animationCurve | Animation curve of the connection notification | Curve? | Curves.fastOutSlowIn |No
 animationDuration | Animation duration of the connection notification | Duration? | 300 milliseconds |No
-locale | Mirror of MaterialApp [locale] property | Locale? | null |No
-supportedLocales | Mirror of MaterialApp [supportedLocales] property | Iterable<Locale>? | null |No
-localizationsDelegates | Mirror of MaterialApp [localizationsDelegates] property | Iterable<LocalizationsDelegate<dynamic>>? | null |No
-localeListResolutionCallback | Mirror of MaterialApp [localeListResolutionCallback] property | Locale? Function(List<Locale>?, Iterable<Locale>)? | null |No
-localeResolutionCallback | Mirror of MaterialApp [localeResolutionCallback] property | Locale? Function(Locale?, Iterable<Locale>)? | null |No
 connectedContent | Content of connection notification in connected state. if this is given, it will override all the specific parameters for the default content in connected state, typically a [Row] widget | Widget? | null |No
 disconnectedContent | Content of connection notification in disconnected state. if this is given, it will override all the specific parameters for the default content in disconnected state, typically a [Row] widget | Widget? | null |No
 shouldAlwaysPullContentDownOnTopAlignment | If the content of the connection notification should be pulled down in case of top alignment and [height] is grater than twice of top padding only, to test it visually just set a [height] that is bigger than twice of top padding (300 for example) and toggle it between [true] and [false] to see it's effect | bool | true |No
@@ -111,6 +106,32 @@ ConnectionNotifierToggler(
 
 ```
 ---
+#### LocalConnectionNotifier
+
+If you want to show the connection notification for a specific screen only.
+
+```dart
+class LocalConnectionNotificationScreen extends StatelessWidget {
+  const LocalConnectionNotificationScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return LocalConnectionNotifier(
+      connectionNotificationOptions: const ConnectionNotificationOptions(
+        alignment: Alignment.bottomCenter,
+      ),
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Local connection Notifier Demo'),
+        ),
+      ),
+    );
+  }
+}
+
+
+```
+---
 #### ConnectionNotifierTools
 
 Tools that make it very easy to check on the internet connection status ANY WHERE inside your project.
@@ -123,7 +144,7 @@ At first you need to initialize it before using it's data. To do that, simply ca
 Then you can use these tools as you want:
 
 ```dart
- /// A boolean that has the latest update about the connection status
+ /// A boolean that has the latest update about the connection status.
  ConnectionNotifierTools.isConnected;
 
  /// A broadcast stream that emits on every change in the connection status. 

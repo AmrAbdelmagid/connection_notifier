@@ -13,12 +13,16 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    /// Wrap [MaterialApp] with [ConnectionNotifier], and that is it!
-    return const ConnectionNotifier(
-      alignment: AlignmentDirectional.bottomCenter,
+    /// Wrap [MaterialApp] with [ConnectionNotifier], and that is it!.
+    return ConnectionNotifier(
+      connectionNotificationOptions: const ConnectionNotificationOptions(
+        alignment: AlignmentDirectional.bottomCenter,
+      ),
       child: MaterialApp(
         title: 'Connection Notifier Demo',
-        home: MyHomePage(),
+        themeMode: ThemeMode.dark,
+        darkTheme: ThemeData.dark(),
+        home: const MyHomePage(),
       ),
     );
   }
@@ -29,40 +33,67 @@ class MyHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Connection Notifier Demo'),
-      ),
-
-      /// If you want to toggle some widgets based on connection state
-      body: ConnectionNotifierToggler(
-        onConnectionStatusChanged: (connected) {
-          /// that means it is still in the initialization phase.
-          if (connected == null) return;
-          print(connected);
-        },
-        connected: Center(
-          key: UniqueKey(),
-          child: const Text(
-            'Connected',
-            style: TextStyle(
-              color: Colors.green,
-              fontSize: 48,
-            ),
-          ),
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => const LocalConnectionNotificationScreen()));
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Connection Notifier Demo'),
         ),
-        disconnected: Center(
-          key: UniqueKey(),
-          child: TextButton(
-            onPressed: () {},
+
+        /// If you want to toggle some widgets based on connection state.
+        body: ConnectionNotifierToggler(
+          onConnectionStatusChanged: (connected) {
+            /// that means it is still in the initialization phase.
+            if (connected == null) return;
+            debugPrint(connected.toString());
+          },
+          connected: Center(
+            key: UniqueKey(),
             child: const Text(
-              'Disconnected',
+              'Connected',
               style: TextStyle(
-                color: Colors.red,
+                color: Colors.green,
                 fontSize: 48,
               ),
             ),
           ),
+          disconnected: Center(
+            key: UniqueKey(),
+            child: TextButton(
+              onPressed: () {},
+              child: const Text(
+                'Disconnected',
+                style: TextStyle(
+                  color: Colors.red,
+                  fontSize: 48,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class LocalConnectionNotificationScreen extends StatelessWidget {
+  const LocalConnectionNotificationScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    /// Use [LocalConnectionNotifier] if you want to show the connection
+    /// notification on one screen only, like [LocalConnectionNotificationScreen]
+    /// in this example.
+    return LocalConnectionNotifier(
+      connectionNotificationOptions: const ConnectionNotificationOptions(
+        alignment: Alignment.bottomCenter,
+      ),
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Local connection Notifier Demo'),
         ),
       ),
     );

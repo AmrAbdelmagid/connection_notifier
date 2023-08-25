@@ -11,7 +11,8 @@ class _ConnectionNotifierState extends State<ConnectionNotifier> {
   void initState() {
     super.initState();
 
-    if (widget.pauseConnectionListenerWhenAppInBackground) {
+    if (widget.connectionNotificationOptions
+        .pauseConnectionListenerWhenAppInBackground) {
       appLifecycleObserver.stream.listen(
         (state) {
           switch (state) {
@@ -35,33 +36,43 @@ class _ConnectionNotifierState extends State<ConnectionNotifier> {
     await connectionStatusOverlay.show(
       context: context,
       isConnected: isConnected,
-      alignment: widget.alignment,
-      height: widget.height,
-      width: widget.width,
-      connectedBackgroundColor: widget.connectedBackgroundColor,
-      disconnectedBackgroundColor: widget.disconnectedBackgroundColor,
-      connectedContent: widget.connectedContent,
-      disconnectedContent: widget.disconnectedContent,
-      connectedText: widget.connectedText,
-      disconnectedText: widget.disconnectedText,
-      overlayAnimationType: widget.overlayAnimationType,
-      shouldAlwaysPullContentDownOnTopAlignment:
-          widget.shouldAlwaysPullContentDownOnTopAlignment,
-      animationCurve: widget.animationCurve,
-      animationDuration: widget.animationDuration,
-      hasIndicationIcon: widget.hasIndicationIcon,
-      connectedTextStyle: widget.connectedTextStyle,
-      disconnectedTextStyle: widget.disconnectedTextStyle,
-      connectedIcon: widget.connectedIcon,
-      disconnectedIcon: widget.disconnectedIcon,
-      textAndIconSeparationWith: widget.textAndIconSeparationWidth,
-      iconBoxSideLength: widget.iconBoxSideLength,
-      connectedConnectionNotification: widget.connectedConnectionNotification,
-      disconnectedConnectionNotification:
-          widget.disconnectedConnectionNotification,
-      borderRadius: widget.borderRadius,
-      connectedDuration: widget.connectedDuration,
-      disconnectedDuration: widget.disconnectedDuration,
+      alignment: widget.connectionNotificationOptions.alignment,
+      height: widget.connectionNotificationOptions.height,
+      width: widget.connectionNotificationOptions.width,
+      connectedBackgroundColor:
+          widget.connectionNotificationOptions.connectedBackgroundColor,
+      disconnectedBackgroundColor:
+          widget.connectionNotificationOptions.disconnectedBackgroundColor,
+      connectedContent: widget.connectionNotificationOptions.connectedContent,
+      disconnectedContent:
+          widget.connectionNotificationOptions.disconnectedContent,
+      connectedText: widget.connectionNotificationOptions.connectedText,
+      disconnectedText: widget.connectionNotificationOptions.disconnectedText,
+      overlayAnimationType:
+          widget.connectionNotificationOptions.overlayAnimationType,
+      shouldAlwaysPullContentDownOnTopAlignment: widget
+          .connectionNotificationOptions
+          .shouldAlwaysPullContentDownOnTopAlignment,
+      animationCurve: widget.connectionNotificationOptions.animationCurve,
+      animationDuration: widget.connectionNotificationOptions.animationDuration,
+      hasIndicationIcon: widget.connectionNotificationOptions.hasIndicationIcon,
+      connectedTextStyle:
+          widget.connectionNotificationOptions.connectedTextStyle,
+      disconnectedTextStyle:
+          widget.connectionNotificationOptions.disconnectedTextStyle,
+      connectedIcon: widget.connectionNotificationOptions.connectedIcon,
+      disconnectedIcon: widget.connectionNotificationOptions.disconnectedIcon,
+      textAndIconSeparationWith:
+          widget.connectionNotificationOptions.textAndIconSeparationWidth,
+      iconBoxSideLength: widget.connectionNotificationOptions.iconBoxSideLength,
+      connectedConnectionNotification:
+          widget.connectionNotificationOptions.connectedConnectionNotification,
+      disconnectedConnectionNotification: widget
+          .connectionNotificationOptions.disconnectedConnectionNotification,
+      borderRadius: widget.connectionNotificationOptions.borderRadius,
+      connectedDuration: widget.connectionNotificationOptions.connectedDuration,
+      disconnectedDuration:
+          widget.connectionNotificationOptions.disconnectedDuration,
     );
   }
 

@@ -108,21 +108,25 @@ class _OverlayAnimationState extends State<OverlayAnimation>
 
       _controller.addStatusListener(
         (status) async {
-          if (widget.isConnected) {
-            if (status == AnimationStatus.completed) {
-              await Future.delayed(
-                widget.connectedDuration ?? const Duration(seconds: 2),
-              );
-              await _controller.reverse();
-              widget.hideOverlay();
-            }
-          } else {
-            if (widget.disconnectedDuration != null) {
-              await Future.delayed(
-                widget.disconnectedDuration!,
-              );
-              await _controller.reverse();
-              widget.hideOverlay();
+          if (mounted) {
+            if (widget.isConnected) {
+              if (status == AnimationStatus.completed) {
+                await Future.delayed(
+                  widget.connectedDuration ?? const Duration(seconds: 2),
+                );
+
+                await _controller.reverse();
+
+                widget.hideOverlay();
+              }
+            } else {
+              if (widget.disconnectedDuration != null) {
+                await Future.delayed(
+                  widget.disconnectedDuration!,
+                );
+                await _controller.reverse();
+                widget.hideOverlay();
+              }
             }
           }
         },
