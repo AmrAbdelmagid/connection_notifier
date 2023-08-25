@@ -1,6 +1,6 @@
 name: connection_notifier
 description: A Flutter package that notifies when no internet connection as well as providing simple tools that help tracking the internet connection status.
-version: 2.0.0
+version: 2.0.1
 homepage: https://github.com/AmrAbdelmagid/connection_notifier
 
 environment:

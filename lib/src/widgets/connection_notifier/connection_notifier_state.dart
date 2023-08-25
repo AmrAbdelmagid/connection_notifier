@@ -22,6 +22,7 @@ class _ConnectionNotifierState extends State<ConnectionNotifier> {
             case AppLifecycleState.inactive:
             case AppLifecycleState.paused:
             case AppLifecycleState.detached:
+            case AppLifecycleState.hidden:
               connectionNotifierManager.pause();
           }
         },

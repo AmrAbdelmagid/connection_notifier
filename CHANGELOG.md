@@ -1,3 +1,5 @@
+## 2.0.1
+- Fix linter warning of missing case clause for hidden case in AppLifecycleState.
 ## 2.0.0
 
 - Introducing the new `LocalConnectionNotifier` for showing local connection notification per specific screen.
