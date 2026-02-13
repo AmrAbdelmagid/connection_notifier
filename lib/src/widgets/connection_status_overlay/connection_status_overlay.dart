@@ -11,6 +11,7 @@ import 'package:flutter/material.dart'
         Icon,
         Overlay,
         OverlayEntry,
+        OverlayState,
         TextStyle,
         Widget;
 
@@ -30,6 +31,7 @@ class ConnectionStatusOverlay {
 
   Future<void> show({
     required BuildContext context,
+    OverlayState? overlayState,
     required bool isConnected,
     required AlignmentGeometry alignment,
     required OverlayAnimationType overlayAnimationType,
@@ -64,6 +66,7 @@ class ConnectionStatusOverlay {
     if (context.mounted) {
       _controller = _showOverlay(
         context: context,
+        overlayState: overlayState,
         isConnected: isConnected,
         alignment: alignment,
         height: height,
@@ -103,6 +106,7 @@ class ConnectionStatusOverlay {
 
   ConnectionStatusOverlayController _showOverlay({
     required BuildContext context,
+    OverlayState? overlayState,
     required bool isConnected,
     required AlignmentGeometry alignment,
     required double? height,
@@ -165,7 +169,8 @@ class ConnectionStatusOverlay {
       ),
     );
 
-    final state = Overlay.of(context);
+    // Use provided overlayState or get it from context with rootOverlay: true
+    final state = overlayState ?? Overlay.of(context, rootOverlay: true);
     state.insert(overlay);
 
     return ConnectionStatusOverlayController(

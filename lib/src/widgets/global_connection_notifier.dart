@@ -1,10 +1,57 @@
-part of connection_notifier_manager;
+import 'dart:async' show StreamSubscription;
+import 'package:flutter/material.dart';
+import 'package:connection_notifier/connection_notifier.dart'
+    show ConnectionNotificationOptions;
+import 'package:connection_notifier/src/core/manager/connection_notifier_manager.dart';
+import 'package:connection_notifier/src/core/internal/connection_notifier_internet_connection_status.dart';
+import 'package:connection_notifier/src/utils/app_lifecycle_observer.dart';
+import 'package:connection_notifier/src/widgets/connection_status_overlay/connection_status_overlay.dart';
 
-class _ConnectionNotifierState extends State<ConnectionNotifier> {
+/// Wraps your MaterialApp to enable connection notifications throughout your app.
+///
+/// This is the **ONLY** widget you need to use! Simply wrap your MaterialApp
+/// with this widget and connection notifications will work everywhere.
+///
+/// Works with ALL navigation types:
+/// - Navigator 1.0 (classic navigation)
+/// - Navigator 2.0 (declarative navigation)
+/// - GoRouter, AutoRoute, Beamer, etc.
+/// - Web applications
+///
+/// Example:
+/// ```dart
+/// GlobalConnectionNotifier(
+///   connectionNotificationOptions: ConnectionNotificationOptions(
+///     alignment: Alignment.topCenter,
+///     // ... other options
+///   ),
+///   child: MaterialApp(
+///     home: MyHomePage(),
+///   ),
+/// )
+/// ```
+class GlobalConnectionNotifier extends StatefulWidget {
+  const GlobalConnectionNotifier({
+    Key? key,
+    required this.child,
+    this.connectionNotificationOptions = const ConnectionNotificationOptions(),
+  }) : super(key: key);
+
+  /// The child widget, typically [MaterialApp] or [CupertinoApp]
+  final Widget child;
+
+  /// Configuration options for connection notifications
+  final ConnectionNotificationOptions connectionNotificationOptions;
+
+  @override
+  State<GlobalConnectionNotifier> createState() =>
+      _GlobalConnectionNotifierState();
+}
+
+class _GlobalConnectionNotifierState extends State<GlobalConnectionNotifier> {
   final AppLifecycleObserver appLifecycleObserver = AppLifecycleObserver();
   final ConnectionNotifierManager connectionNotifierManager =
       ConnectionNotifierManager.instance;
-
   final connectionStatusOverlay = ConnectionStatusOverlay.instance;
 
   late final StreamSubscription<ConnectionNotifierInternetConnectionStatus?>
@@ -38,14 +85,42 @@ class _ConnectionNotifierState extends State<ConnectionNotifier> {
     );
   }
 
+  /// Finds the OverlayState by traversing child elements to locate Navigator
+  OverlayState? _findOverlayState() {
+    NavigatorState? navigator;
+
+    void visitor(Element element) {
+      if (navigator != null) return;
+
+      if (element.widget is Navigator) {
+        navigator = (element as StatefulElement).state as NavigatorState?;
+      } else {
+        element.visitChildElements(visitor);
+      }
+    }
+
+    context.visitChildElements(visitor);
+    return navigator?.overlay;
+  }
+
   Future<void> _showOverlay({
     required bool isConnected,
   }) async {
     if (!mounted) return;
 
+    final overlayState = _findOverlayState();
+
+    if (overlayState == null) {
+      debugPrint(
+        'GlobalConnectionNotifier: Could not find Navigator overlay. '
+        'Make sure GlobalConnectionNotifier wraps MaterialApp/CupertinoApp.',
+      );
+      return;
+    }
+
     await connectionStatusOverlay.show(
       context: context,
-      overlayState: widget.overlayState,
+      overlayState: overlayState,
       isConnected: isConnected,
       alignment: widget.connectionNotificationOptions.alignment,
       height: widget.connectionNotificationOptions.height,

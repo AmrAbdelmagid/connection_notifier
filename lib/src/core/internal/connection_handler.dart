@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart' show immutable;
-import 'package:internet_connection_checker/internet_connection_checker.dart'
-    show InternetConnectionChecker, InternetConnectionStatus;
+import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart'
+    show InternetConnection, InternetStatus;
 import 'package:rxdart/rxdart.dart';
 
 import 'connection_notifier_internet_connection_status.dart'
@@ -9,14 +9,13 @@ import 'connection_notifier_internet_connection_status.dart'
 @immutable
 class ConnectionHandler {
   static Stream<ConnectionNotifierInternetConnectionStatus>
-      get onStatusChange =>
-          InternetConnectionChecker().onStatusChange.switchMap(
-            (value) {
+      get onStatusChange => InternetConnection().onStatusChange.switchMap(
+            (InternetStatus value) {
               switch (value) {
-                case InternetConnectionStatus.connected:
+                case InternetStatus.connected:
                   return Stream.value(
                       ConnectionNotifierInternetConnectionStatus.connected);
-                case InternetConnectionStatus.disconnected:
+                case InternetStatus.disconnected:
                   return Stream.value(
                       ConnectionNotifierInternetConnectionStatus.disconnected);
               }

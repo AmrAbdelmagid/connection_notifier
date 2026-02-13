@@ -13,17 +13,26 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    /// Wrap [MaterialApp] with [ConnectionNotifier], and that is it!.
-    return ConnectionNotifier(
-      connectionNotificationOptions: const ConnectionNotificationOptions(
-        alignment: AlignmentDirectional.bottomCenter,
+    /// RECOMMENDED APPROACH: Use MaterialApp builder for localization support
+    /// This example shows the basic usage without localization.
+    /// For localization, see the README.md file.
+    return MaterialApp(
+      title: 'Connection Notifier Demo',
+      themeMode: ThemeMode.dark,
+      darkTheme: ThemeData.dark(),
+      // Use builder to wrap with GlobalConnectionNotifier
+      builder: (context, child) => GlobalConnectionNotifier(
+        connectionNotificationOptions: const ConnectionNotificationOptions(
+          alignment: Alignment.bottomCenter,
+          // For localized messages, use:
+          // connectedText: 'connectionRestored'.tr(context: context),
+          // disconnectedText: 'connectionLost'.tr(context: context),
+          // notifyForLowConnection: true,
+          // lowConnectionText: 'connectionSlow'.tr(context: context),
+        ),
+        child: child!,
       ),
-      child: MaterialApp(
-        title: 'Connection Notifier Demo',
-        themeMode: ThemeMode.dark,
-        darkTheme: ThemeData.dark(),
-        home: const MyHomePage(),
-      ),
+      home: const MyHomePage(),
     );
   }
 }
