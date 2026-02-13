@@ -1,17 +1,17 @@
 name: connection_notifier
 description: A Flutter package that notifies when no internet connection as well as providing simple tools that help tracking the internet connection status.
-version: 2.0.1
+version: 3.0.0
 homepage: https://github.com/AmrAbdelmagid/connection_notifier
 
 environment:
-  sdk: '>=2.17.0 <4.0.0'
-  flutter: ">=1.17.0"
+  sdk: '>=3.2.0 <4.0.0'
+  flutter: '>=3.3.0'
 
 dependencies:
-  rxdart: ^0.27.7
+  rxdart: ^0.28.0
   flutter:
     sdk: flutter
-  internet_connection_checker: ^1.0.0+1
+  internet_connection_checker_plus: ^2.9.1+2
 
 dev_dependencies:
   flutter_test:

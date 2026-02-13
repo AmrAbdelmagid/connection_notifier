@@ -17,16 +17,30 @@ class ConnectionNotifierManager {
     }
   }
 
-  bool? get isConnected => _connection.value;
+  bool? get isConnected {
+    if (_connectionStatus.value == null) return null;
+    return _connectionStatus.value ==
+        ConnectionNotifierInternetConnectionStatus.connected;
+  }
 
   static final ConnectionNotifierManager _shared =
       ConnectionNotifierManager._sharedInstance();
 
   static ConnectionNotifierManager get instance => _shared;
 
-  Stream<bool?> get connection => _connection.stream.asBroadcastStream();
+  Stream<bool?> get connection => _connectionStatus.stream.map((status) {
+        if (status == null) return null;
+        if (status == ConnectionNotifierInternetConnectionStatus.disconnected) {
+          return false;
+        }
+        return true;
+      }).asBroadcastStream();
 
-  final BehaviorSubject<bool?> _connection = BehaviorSubject()..add(null);
+  Stream<ConnectionNotifierInternetConnectionStatus?> get connectionStatus =>
+      _connectionStatus.stream.asBroadcastStream();
+
+  final BehaviorSubject<ConnectionNotifierInternetConnectionStatus?>
+      _connectionStatus = BehaviorSubject()..add(null);
 
   final Completer<bool> _initializationCompleter = Completer();
 
@@ -34,7 +48,7 @@ class ConnectionNotifierManager {
 
   bool _pauseListening = false;
 
-  bool _connected = false;
+  ConnectionNotifierInternetConnectionStatus? _currentStatus;
 
   StreamSubscription<ConnectionNotifierInternetConnectionStatus>? _subscription;
 
@@ -43,17 +57,14 @@ class ConnectionNotifierManager {
       (status) {
         final connected =
             status == ConnectionNotifierInternetConnectionStatus.connected;
-        _connected = connected;
+        _currentStatus = status;
         if (_pauseListening) {
           return;
         } else {
-          if (connected) {
-            _wasPreviouslyConnected = connected;
-            _connection.add(true);
-          } else {
+          _wasPreviousStatus = _currentStatus;
+          _connectionStatus.add(status);
+          if (!connected) {
             showConnectionNotification = true;
-            _wasPreviouslyConnected = connected;
-            _connection.add(false);
           }
         }
         if (!_initializationCompleter.isCompleted) {
@@ -64,7 +75,7 @@ class ConnectionNotifierManager {
     return _initializationCompleter.future;
   }
 
-  var _wasPreviouslyConnected = false;
+  ConnectionNotifierInternetConnectionStatus? _wasPreviousStatus;
 
   void _pauseListeningToChanges(bool paused) {
     if (paused) {
@@ -79,11 +90,18 @@ class ConnectionNotifierManager {
       _pauseListening = paused;
     }
 
-    if (!paused && !_connected) {
-      _connection.add(false);
-    } else if (!paused && _connected && !_wasPreviouslyConnected) {
-      _connection.add(true);
-      _wasPreviouslyConnected = true;
+    if (!paused && _currentStatus != null) {
+      final wasDisconnected = _currentStatus ==
+          ConnectionNotifierInternetConnectionStatus.disconnected;
+      final wasConnected = _wasPreviousStatus ==
+          ConnectionNotifierInternetConnectionStatus.connected;
+
+      if (wasDisconnected) {
+        _connectionStatus.add(_currentStatus);
+      } else if (!wasConnected) {
+        _connectionStatus.add(_currentStatus);
+        _wasPreviousStatus = _currentStatus;
+      }
     }
   }
 
