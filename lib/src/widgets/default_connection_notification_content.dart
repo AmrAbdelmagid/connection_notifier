@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart'
     show
         AlwaysStoppedAnimation,
-        Brightness,
         BuildContext,
         Center,
         CircularProgressIndicator,
@@ -14,13 +13,9 @@ import 'package:flutter/material.dart'
         Row,
         SizedBox,
         StatelessWidget,
-        TargetPlatform,
         Text,
         TextStyle,
-        Theme,
         Widget;
-import 'package:flutter/cupertino.dart'
-    show CupertinoActivityIndicator, CupertinoTheme;
 
 class DefaultConnectionNotificationContent extends StatelessWidget {
   const DefaultConnectionNotificationContent({
@@ -50,8 +45,6 @@ class DefaultConnectionNotificationContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool isIOS = Theme.of(context).platform == TargetPlatform.iOS;
-
     return Center(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -77,17 +70,9 @@ class DefaultConnectionNotificationContent extends StatelessWidget {
                         color: Colors.white,
                       )
                   : disconnectedIcon ??
-                      (isIOS
-                          ? CupertinoTheme(
-                              data: CupertinoTheme.of(context)
-                                  .copyWith(brightness: Brightness.dark),
-                              child: const CupertinoActivityIndicator(),
-                            )
-                          : const CircularProgressIndicator(
-                              valueColor:
-                                  AlwaysStoppedAnimation<Color>(Colors.white),
-                              strokeWidth: 2.0,
-                            )),
+                      const CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
             ),
         ],
       ),

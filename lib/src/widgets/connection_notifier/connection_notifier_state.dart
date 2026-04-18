@@ -28,23 +28,21 @@ class _ConnectionNotifierState extends State<ConnectionNotifier> {
 
     _subscribeConnectionListener();
 
-    if (widget.connectionNotificationOptions
-        .pauseConnectionListenerWhenAppInBackground) {
-      appLifecycleObserver.stream.listen(
-        (state) {
-          switch (state) {
-            case AppLifecycleState.resumed:
-              connectionNotifierManager.resume();
-              break;
-            case AppLifecycleState.inactive:
-            case AppLifecycleState.paused:
-            case AppLifecycleState.detached:
-            case AppLifecycleState.hidden:
-              connectionNotifierManager.pause();
-          }
-        },
-      );
-    }
+    appLifecycleObserver.stream.listen(
+      (state) {
+        switch (state) {
+          case AppLifecycleState.resumed:
+            connectionNotifierManager.resume();
+            break;
+          case AppLifecycleState.inactive:
+            break;
+          case AppLifecycleState.paused:
+          case AppLifecycleState.detached:
+          case AppLifecycleState.hidden:
+            connectionNotifierManager.pause();
+        }
+      },
+    );
   }
 
   Future<void> _showOverlay({
@@ -102,7 +100,7 @@ class _ConnectionNotifierState extends State<ConnectionNotifier> {
 
     switch (status) {
       case ConnectionNotifierInternetConnectionStatus.connected:
-        if (connectionNotifierManager.showConnectionNotification) {
+        if (connectionNotifierManager.consumeConnectedNotification()) {
           await _showOverlay(isConnected: true);
         }
         break;

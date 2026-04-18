@@ -75,23 +75,21 @@ class _GlobalConnectionNotifierState extends State<GlobalConnectionNotifier> {
 
     _subscribeConnectionListener();
 
-    if (widget.connectionNotificationOptions
-        .pauseConnectionListenerWhenAppInBackground) {
-      appLifecycleObserver.stream.listen(
-        (state) {
-          switch (state) {
-            case AppLifecycleState.resumed:
-              connectionNotifierManager.resume();
-              break;
-            case AppLifecycleState.inactive:
-            case AppLifecycleState.paused:
-            case AppLifecycleState.detached:
-            case AppLifecycleState.hidden:
-              connectionNotifierManager.pause();
-          }
-        },
-      );
-    }
+    appLifecycleObserver.stream.listen(
+      (state) {
+        switch (state) {
+          case AppLifecycleState.resumed:
+            connectionNotifierManager.resume();
+            break;
+          case AppLifecycleState.inactive:
+            break;
+          case AppLifecycleState.paused:
+          case AppLifecycleState.detached:
+          case AppLifecycleState.hidden:
+            connectionNotifierManager.pause();
+        }
+      },
+    );
   }
 
   /// Finds the OverlayState by traversing child elements to locate Navigator
@@ -177,7 +175,7 @@ class _GlobalConnectionNotifierState extends State<GlobalConnectionNotifier> {
 
     switch (status) {
       case ConnectionNotifierInternetConnectionStatus.connected:
-        if (connectionNotifierManager.showConnectionNotification) {
+        if (connectionNotifierManager.consumeConnectedNotification()) {
           await _showOverlay(isConnected: true);
         }
         break;

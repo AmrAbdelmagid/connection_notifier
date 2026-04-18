@@ -36,22 +36,53 @@ class ConnectionNotifierManager {
   Stream<ConnectionNotifierInternetConnectionStatus?> get connectionStatus =>
       _connectionStatus.stream.asBroadcastStream();
 
+  /// Internal status stream source. Starts as `null` until first resolution.
   final BehaviorSubject<ConnectionNotifierInternetConnectionStatus?>
       _connectionStatus = BehaviorSubject()..add(null);
 
+  /// Arms a one-shot "Back Online" notification after a disconnect.
   bool showConnectionNotification = false;
 
+  /// Optional injected connection handler from the consumer.
   ConnectionHandler? _connectionHandler;
 
+  /// Active handler used by the manager (injected or default implementation).
   ConnectionHandler get connectionHandler =>
       _connectionHandler ?? const ConnectionNotifierHandlerImpl();
 
-  bool _pauseListening = false;
-
+  /// Last known connectivity status.
   ConnectionNotifierInternetConnectionStatus? _currentStatus;
 
+  /// Monotonic token to invalidate stale delayed resume operations.
+  int _resumeToken = 0;
+
+  /// Tracks whether the app is currently in background lifecycle states.
+  bool _isAppInBackground = false;
+
+  /// Subscription to handler connectivity updates.
   StreamSubscription<ConnectionNotifierInternetConnectionStatus>? _subscription;
 
+  void _subscribeToConnectionChanges() {
+    if (_subscription != null) return;
+
+    _subscription = connectionHandler.onStatusChange.listen(
+      (status) {
+        if (_currentStatus == status) {
+          return;
+        }
+        _currentStatus = status;
+        _connectionStatus.add(status);
+        if (status == ConnectionNotifierInternetConnectionStatus.disconnected) {
+          showConnectionNotification = true;
+        }
+      },
+    );
+  }
+
+  /// Initializes connectivity monitoring.
+  ///
+  /// Pass [connectionHandler] to override the default implementation.
+  /// Returns the current internet connectivity after initial resolution.
   Future<bool> initialize({ConnectionHandler? connectionHandler}) async {
     if (connectionHandler != null &&
         !identical(_connectionHandler, connectionHandler)) {
@@ -67,26 +98,12 @@ class ConnectionNotifierManager {
       return _resolveCurrentConnection();
     }
 
-    _subscription = this.connectionHandler.onStatusChange.listen(
-      (status) {
-        final connected =
-            status == ConnectionNotifierInternetConnectionStatus.connected;
-        _currentStatus = status;
-        if (_pauseListening) {
-          return;
-        } else {
-          _wasPreviousStatus = _currentStatus;
-          _connectionStatus.add(status);
-          if (!connected) {
-            showConnectionNotification = true;
-          }
-        }
-      },
-    );
+    _subscribeToConnectionChanges();
 
     return _resolveCurrentConnection();
   }
 
+  /// Resolves the current connectivity using cached status or a fresh check.
   Future<bool> _resolveCurrentConnection() async {
     if (_currentStatus != null) {
       return _currentStatus ==
@@ -98,15 +115,17 @@ class ConnectionNotifierManager {
     return hasInternetAccess;
   }
 
-  ConnectionNotifierInternetConnectionStatus? _wasPreviousStatus;
-
+  /// Pushes a connectivity state into the stream if it changed.
   void setConnectionStatus(bool isConnected) {
     final status = isConnected
         ? ConnectionNotifierInternetConnectionStatus.connected
         : ConnectionNotifierInternetConnectionStatus.disconnected;
 
+    if (_currentStatus == status) {
+      return;
+    }
+
     _currentStatus = status;
-    _wasPreviousStatus = status;
     _connectionStatus.add(status);
 
     if (!isConnected) {
@@ -114,39 +133,42 @@ class ConnectionNotifierManager {
     }
   }
 
-  void _pauseListeningToChanges(bool paused) {
-    if (paused) {
-      _subscription?.pause();
-    } else {
-      _subscription?.resume();
+  /// Consumes and resets the one-shot connected notification flag.
+  bool consumeConnectedNotification() {
+    if (!showConnectionNotification) {
+      return false;
     }
 
-    if (_pauseListening == paused) {
-      return;
-    } else {
-      _pauseListening = paused;
-    }
-
-    if (!paused && _currentStatus != null) {
-      final wasDisconnected = _currentStatus ==
-          ConnectionNotifierInternetConnectionStatus.disconnected;
-      final wasConnected = _wasPreviousStatus ==
-          ConnectionNotifierInternetConnectionStatus.connected;
-
-      if (wasDisconnected) {
-        _connectionStatus.add(_currentStatus);
-      } else if (!wasConnected) {
-        _connectionStatus.add(_currentStatus);
-        _wasPreviousStatus = _currentStatus;
-      }
-    }
+    showConnectionNotification = false;
+    return true;
   }
 
-  void resume() {
-    _pauseListeningToChanges(false);
-  }
-
+  /// Called when the app goes to background.
+  /// Cancels the subscription entirely so no buffered events accumulate.
   void pause() {
-    _pauseListeningToChanges(true);
+    if (_isAppInBackground) return;
+
+    _isAppInBackground = true;
+    _subscription?.cancel();
+    _subscription = null;
+    _resumeToken++;
+  }
+
+  /// Called when the app returns to foreground.
+  /// Waits 3 seconds to let the OS settle network state, then re-subscribes.
+  Future<void> resume() async {
+    _isAppInBackground = false;
+    final token = ++_resumeToken;
+
+    await Future.delayed(const Duration(seconds: 3));
+
+    // If pause() was called again during the delay, abort.
+    if (_isAppInBackground || token != _resumeToken) return;
+
+    _subscribeToConnectionChanges();
+
+    final hasInternetAccess = await connectionHandler.hasInternetAccess;
+    if (_isAppInBackground || token != _resumeToken) return;
+    setConnectionStatus(hasInternetAccess);
   }
 }

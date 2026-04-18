@@ -2,7 +2,7 @@
 
 A simple way to notify your user about the connection status as well as providing simple tools that help tracking the internet connection status.
 
-**Version 3.0+**: Now with full **Navigator 2.0 support**, **Web support**, and works seamlessly with all modern routing solutions!
+**Version 4.0+**: Now with injectable connectivity handlers, full **Navigator 2.0 support**, **Web support**, and seamless support for modern routing solutions.
 
 ## Gallery
 
@@ -99,7 +99,7 @@ class MyApp extends StatelessWidget {
 Works everywhere:
 - ✅ **iOS**
 - ✅ **Android**
-- ✅ **Web** (New in v3.0!)
+- ✅ **Web**
 - ✅ **macOS**
 - ✅ **Windows**
 - ✅ **Linux**
@@ -147,7 +147,6 @@ class MyApp extends StatelessWidget {
 | Option | Description | Type | Default Value | Required |
 |---|---|---|---|:---:|
 | alignment | Alignment of the connection notification | AlignmentGeometry | AlignmentDirectional.topCenter | No |
-| pauseConnectionListenerWhenAppInBackground | Pause listening to changes while app in background | bool | false | No |
 | height | Height of the connection notification | double? | twice top padding | No |
 | width | Width of the connection notification | double? | double.infinity | No |
 | borderRadius | Border radius of the connection notification | BorderRadiusGeometry? | null | No |
@@ -465,7 +464,6 @@ class MyApp extends StatelessWidget {
         connectedText: 'Back Online!',
         disconnectedText: 'No Internet Connection',
         connectedDuration: const Duration(seconds: 3),
-        pauseConnectionListenerWhenAppInBackground: true,
       ),
       child: MaterialApp(
         title: 'Connection Notifier Demo',
