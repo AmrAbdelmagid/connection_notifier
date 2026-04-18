@@ -7,12 +7,26 @@ class _ConnectionNotifierState extends State<ConnectionNotifier> {
 
   final connectionStatusOverlay = ConnectionStatusOverlay.instance;
 
-  late final StreamSubscription<ConnectionNotifierInternetConnectionStatus?>
+  StreamSubscription<ConnectionNotifierInternetConnectionStatus?>?
       _connectionSubscription;
+
+  void _subscribeConnectionListener() {
+    _connectionSubscription ??=
+        connectionNotifierManager.connectionStatus.listen(
+      (status) => _connectionListener(status),
+    );
+  }
+
+  void _unsubscribeConnectionListener() {
+    _connectionSubscription?.cancel();
+    _connectionSubscription = null;
+  }
 
   @override
   void initState() {
     super.initState();
+
+    _subscribeConnectionListener();
 
     if (widget.connectionNotificationOptions
         .pauseConnectionListenerWhenAppInBackground) {
@@ -31,11 +45,6 @@ class _ConnectionNotifierState extends State<ConnectionNotifier> {
         },
       );
     }
-
-    // Set up connection listener once in initState
-    _connectionSubscription = connectionNotifierManager.connectionStatus.listen(
-      (status) => _connectionListener(status),
-    );
   }
 
   Future<void> _showOverlay({
@@ -105,7 +114,7 @@ class _ConnectionNotifierState extends State<ConnectionNotifier> {
 
   @override
   void dispose() {
-    _connectionSubscription.cancel();
+    _unsubscribeConnectionListener();
     appLifecycleObserver.dispose();
     super.dispose();
   }

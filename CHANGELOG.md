@@ -1,3 +1,16 @@
+## 4.0.0
+
+### New Features
+- Added injectable `ConnectionHandler` interface support.
+- Added default implementation `ConnectionNotifierHandlerImpl`.
+- Added optional `connectionHandler` parameter to `ConnectionNotifierTools.initialize(...)`.
+
+### Behavior Changes
+- Removed `useManualMode` from `ConnectionNotificationOptions`.
+- Connectivity source is now fully pluggable via `ConnectionHandler`.
+- If no custom handler is provided, package uses `ConnectionNotifierHandlerImpl`.
+- Removed manual notification APIs from `ConnectionNotifierTools`.
+
 ## 3.0.0
 
 **Major Release - Navigator 2.0 & Web Support**

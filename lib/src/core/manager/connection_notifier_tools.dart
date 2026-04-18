@@ -1,7 +1,7 @@
+import 'package:connection_notifier/src/core/public/connection_handler.dart';
 import 'package:connection_notifier/src/core/manager/connection_notifier_manager.dart'
     show ConnectionNotifierManager;
 import 'package:flutter/foundation.dart' show immutable;
-import 'package:rxdart/transformers.dart';
 
 /// A class that provides useful tools for connection management. To be used
 /// properly, [initialize] method must be called before using it's data.
@@ -14,9 +14,18 @@ class ConnectionNotifierTools {
 
   /// Initializes the [ConnectionNotifierManager]. Must be called before using
   /// other class data, typically on app initialization.
-  static Future<void> initialize() async {
+  static Future<void> initialize({ConnectionHandler? connectionHandler}) async {
     _connectionNotifierManager = ConnectionNotifierManager.instance;
-    await _connectionNotifierManager.initialize();
+
+    await _connectionNotifierManager.initialize(
+      connectionHandler: connectionHandler,
+    );
+
+    if (_connectionNotifierManager.isConnected == null) {
+      final hasInternetAccess =
+          await _connectionNotifierManager.connectionHandler.hasInternetAccess;
+      _connectionNotifierManager.setConnectionStatus(hasInternetAccess);
+    }
   }
 
   /// A boolean that has the latest update about the connection status.
@@ -24,7 +33,8 @@ class ConnectionNotifierTools {
 
   /// A broadcast stream that emits on every change in the connection status.
   static Stream<bool> get onStatusChange =>
-      _connectionNotifierManager.connection.switchMap<bool>(
-        (isConnected) => Stream.value(isConnected!).asBroadcastStream(),
-      );
+      _connectionNotifierManager.connection
+          .where((isConnected) => isConnected != null)
+          .cast<bool>()
+          .asBroadcastStream();
 }

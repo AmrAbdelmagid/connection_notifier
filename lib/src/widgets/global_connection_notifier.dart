@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:connection_notifier/connection_notifier.dart'
     show ConnectionNotificationOptions;
 import 'package:connection_notifier/src/core/manager/connection_notifier_manager.dart';
-import 'package:connection_notifier/src/core/internal/connection_notifier_internet_connection_status.dart';
+import 'package:connection_notifier/src/core/public/connection_notifier_internet_connection_status.dart';
 import 'package:connection_notifier/src/utils/app_lifecycle_observer.dart';
 import 'package:connection_notifier/src/widgets/connection_status_overlay/connection_status_overlay.dart';
 
@@ -54,12 +54,26 @@ class _GlobalConnectionNotifierState extends State<GlobalConnectionNotifier> {
       ConnectionNotifierManager.instance;
   final connectionStatusOverlay = ConnectionStatusOverlay.instance;
 
-  late final StreamSubscription<ConnectionNotifierInternetConnectionStatus?>
+  StreamSubscription<ConnectionNotifierInternetConnectionStatus?>?
       _connectionSubscription;
+
+  void _subscribeConnectionListener() {
+    _connectionSubscription ??=
+        connectionNotifierManager.connectionStatus.listen(
+      (status) => _connectionListener(status),
+    );
+  }
+
+  void _unsubscribeConnectionListener() {
+    _connectionSubscription?.cancel();
+    _connectionSubscription = null;
+  }
 
   @override
   void initState() {
     super.initState();
+
+    _subscribeConnectionListener();
 
     if (widget.connectionNotificationOptions
         .pauseConnectionListenerWhenAppInBackground) {
@@ -78,11 +92,6 @@ class _GlobalConnectionNotifierState extends State<GlobalConnectionNotifier> {
         },
       );
     }
-
-    // Set up connection listener once in initState
-    _connectionSubscription = connectionNotifierManager.connectionStatus.listen(
-      (status) => _connectionListener(status),
-    );
   }
 
   /// Finds the OverlayState by traversing child elements to locate Navigator
@@ -180,7 +189,7 @@ class _GlobalConnectionNotifierState extends State<GlobalConnectionNotifier> {
 
   @override
   void dispose() {
-    _connectionSubscription.cancel();
+    _unsubscribeConnectionListener();
     appLifecycleObserver.dispose();
     super.dispose();
   }

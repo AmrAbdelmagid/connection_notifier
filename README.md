@@ -26,7 +26,9 @@ If you don't need localization, simply wrap your `MaterialApp`:
 import 'package:connection_notifier/connection_notifier.dart';
 import 'package:flutter/material.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await ConnectionNotifierTools.initialize();
   runApp(const MyApp());
 }
 
@@ -51,6 +53,9 @@ class MyApp extends StatelessWidget {
 ### Recommended Usage (With Localization)
 
 **This is the recommended approach** if you're using any localization package (EasyLocalization, flutter_localizations, intl, etc.):
+
+Call `ConnectionNotifierTools.initialize(...)` once in `main()` before
+`runApp(...)`, same as the basic usage example.
 
 ```dart
 import 'package:connection_notifier/connection_notifier.dart';
@@ -356,6 +361,41 @@ ConnectionNotifierTools.onStatusChange.listen((isConnected) {
   print('Connection status: $isConnected');
 });
 ```
+
+### Custom Connection Handler (Inject Your Own Connectivity Source)
+
+The package is agnostic to how connectivity is detected. By default it uses
+`ConnectionNotifierHandlerImpl` (internet_connection_checker_plus). If you have
+your own source (socket, native SDK, etc.), implement `ConnectionHandler` and
+pass it to `ConnectionNotifierTools.initialize(...)`.
+
+```dart
+import 'package:connection_notifier/connection_notifier.dart';
+
+class MySocketConnectionHandler implements ConnectionHandler {
+  @override
+  Stream<ConnectionNotifierInternetConnectionStatus> get onStatusChange =>
+      mySocketStatusStream.map((isOnline) {
+        return isOnline
+            ? ConnectionNotifierInternetConnectionStatus.connected
+            : ConnectionNotifierInternetConnectionStatus.disconnected;
+      });
+
+  @override
+  Future<bool> get hasInternetAccess async => mySocketIsConnected;
+}
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await ConnectionNotifierTools.initialize(
+    connectionHandler: MySocketConnectionHandler(),
+  );
+  runApp(const MyApp());
+}
+```
+
+The package UI reacts to the handler stream. No manual notification API calls
+are required.
 
 ## Migration Guide
 

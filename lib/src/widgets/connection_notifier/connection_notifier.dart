@@ -3,7 +3,7 @@ library connection_notifier_manager;
 import 'dart:async' show StreamSubscription;
 
 import 'package:connection_notifier/src/core/manager/connection_notifier_manager.dart';
-import 'package:connection_notifier/src/core/internal/connection_notifier_internet_connection_status.dart';
+import 'package:connection_notifier/src/core/public/connection_notifier_internet_connection_status.dart';
 import 'package:connection_notifier/connection_notifier.dart'
     show ConnectionNotificationOptions;
 import 'package:flutter/material.dart'
