@@ -98,6 +98,10 @@ class ConnectionStatusOverlay {
     }
   }
 
+  void hide() {
+    _hide();
+  }
+
   void _hide() {
     _controller?.close();
     _animationController = null;

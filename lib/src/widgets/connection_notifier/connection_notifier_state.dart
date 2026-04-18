@@ -7,34 +7,41 @@ class _ConnectionNotifierState extends State<ConnectionNotifier> {
 
   final connectionStatusOverlay = ConnectionStatusOverlay.instance;
 
-  late final StreamSubscription<ConnectionNotifierInternetConnectionStatus?>
+  StreamSubscription<ConnectionNotifierInternetConnectionStatus?>?
       _connectionSubscription;
+
+  void _subscribeConnectionListener() {
+    _connectionSubscription ??=
+        connectionNotifierManager.connectionStatus.listen(
+      (status) => _connectionListener(status),
+    );
+  }
+
+  void _unsubscribeConnectionListener() {
+    _connectionSubscription?.cancel();
+    _connectionSubscription = null;
+  }
 
   @override
   void initState() {
     super.initState();
 
-    if (widget.connectionNotificationOptions
-        .pauseConnectionListenerWhenAppInBackground) {
-      appLifecycleObserver.stream.listen(
-        (state) {
-          switch (state) {
-            case AppLifecycleState.resumed:
-              connectionNotifierManager.resume();
-              break;
-            case AppLifecycleState.inactive:
-            case AppLifecycleState.paused:
-            case AppLifecycleState.detached:
-            case AppLifecycleState.hidden:
-              connectionNotifierManager.pause();
-          }
-        },
-      );
-    }
+    _subscribeConnectionListener();
 
-    // Set up connection listener once in initState
-    _connectionSubscription = connectionNotifierManager.connectionStatus.listen(
-      (status) => _connectionListener(status),
+    appLifecycleObserver.stream.listen(
+      (state) {
+        switch (state) {
+          case AppLifecycleState.resumed:
+            connectionNotifierManager.resume();
+            break;
+          case AppLifecycleState.inactive:
+            break;
+          case AppLifecycleState.paused:
+          case AppLifecycleState.detached:
+          case AppLifecycleState.hidden:
+            connectionNotifierManager.pause();
+        }
+      },
     );
   }
 
@@ -93,7 +100,7 @@ class _ConnectionNotifierState extends State<ConnectionNotifier> {
 
     switch (status) {
       case ConnectionNotifierInternetConnectionStatus.connected:
-        if (connectionNotifierManager.showConnectionNotification) {
+        if (connectionNotifierManager.consumeConnectedNotification()) {
           await _showOverlay(isConnected: true);
         }
         break;
@@ -105,7 +112,7 @@ class _ConnectionNotifierState extends State<ConnectionNotifier> {
 
   @override
   void dispose() {
-    _connectionSubscription.cancel();
+    _unsubscribeConnectionListener();
     appLifecycleObserver.dispose();
     super.dispose();
   }

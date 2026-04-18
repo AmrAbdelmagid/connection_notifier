@@ -11,5 +11,7 @@ export 'src/widgets/local_connection_notifier.dart';
 
 // Tools and configuration
 export 'src/core/manager/connection_notifier_tools.dart';
+export 'src/core/public/connection_handler.dart';
+export 'src/core/public/connection_notifier_internet_connection_status.dart';
 export 'src/widgets/connection_status_overlay/overlay_animation_type.dart';
 export 'src/models/connection_notification_options.dart';

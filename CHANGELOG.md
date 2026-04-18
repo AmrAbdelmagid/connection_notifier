@@ -1,3 +1,19 @@
+## 4.0.0
+
+### New Features
+- Added injectable `ConnectionHandler` interface support.
+- Added default implementation `ConnectionNotifierHandlerImpl`.
+- Added optional `connectionHandler` parameter to `ConnectionNotifierTools.initialize(...)`.
+
+### Breaking Changes
+- Removed `pauseConnectionListenerWhenAppInBackground` from `ConnectionNotificationOptions`.
+
+### Behavior Changes
+- Connectivity source is now fully pluggable via `ConnectionHandler`.
+- If no custom handler is provided, package uses `ConnectionNotifierHandlerImpl`.
+- Background/foreground handling is managed internally: package pauses in background,
+   resumes after a 3-second foreground delay, and avoids stale resume races.
+
 ## 3.0.0
 
 **Major Release - Navigator 2.0 & Web Support**

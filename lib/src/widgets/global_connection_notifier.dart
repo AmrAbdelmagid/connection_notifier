@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:connection_notifier/connection_notifier.dart'
     show ConnectionNotificationOptions;
 import 'package:connection_notifier/src/core/manager/connection_notifier_manager.dart';
-import 'package:connection_notifier/src/core/internal/connection_notifier_internet_connection_status.dart';
+import 'package:connection_notifier/src/core/public/connection_notifier_internet_connection_status.dart';
 import 'package:connection_notifier/src/utils/app_lifecycle_observer.dart';
 import 'package:connection_notifier/src/widgets/connection_status_overlay/connection_status_overlay.dart';
 
@@ -54,34 +54,41 @@ class _GlobalConnectionNotifierState extends State<GlobalConnectionNotifier> {
       ConnectionNotifierManager.instance;
   final connectionStatusOverlay = ConnectionStatusOverlay.instance;
 
-  late final StreamSubscription<ConnectionNotifierInternetConnectionStatus?>
+  StreamSubscription<ConnectionNotifierInternetConnectionStatus?>?
       _connectionSubscription;
+
+  void _subscribeConnectionListener() {
+    _connectionSubscription ??=
+        connectionNotifierManager.connectionStatus.listen(
+      (status) => _connectionListener(status),
+    );
+  }
+
+  void _unsubscribeConnectionListener() {
+    _connectionSubscription?.cancel();
+    _connectionSubscription = null;
+  }
 
   @override
   void initState() {
     super.initState();
 
-    if (widget.connectionNotificationOptions
-        .pauseConnectionListenerWhenAppInBackground) {
-      appLifecycleObserver.stream.listen(
-        (state) {
-          switch (state) {
-            case AppLifecycleState.resumed:
-              connectionNotifierManager.resume();
-              break;
-            case AppLifecycleState.inactive:
-            case AppLifecycleState.paused:
-            case AppLifecycleState.detached:
-            case AppLifecycleState.hidden:
-              connectionNotifierManager.pause();
-          }
-        },
-      );
-    }
+    _subscribeConnectionListener();
 
-    // Set up connection listener once in initState
-    _connectionSubscription = connectionNotifierManager.connectionStatus.listen(
-      (status) => _connectionListener(status),
+    appLifecycleObserver.stream.listen(
+      (state) {
+        switch (state) {
+          case AppLifecycleState.resumed:
+            connectionNotifierManager.resume();
+            break;
+          case AppLifecycleState.inactive:
+            break;
+          case AppLifecycleState.paused:
+          case AppLifecycleState.detached:
+          case AppLifecycleState.hidden:
+            connectionNotifierManager.pause();
+        }
+      },
     );
   }
 
@@ -168,7 +175,7 @@ class _GlobalConnectionNotifierState extends State<GlobalConnectionNotifier> {
 
     switch (status) {
       case ConnectionNotifierInternetConnectionStatus.connected:
-        if (connectionNotifierManager.showConnectionNotification) {
+        if (connectionNotifierManager.consumeConnectedNotification()) {
           await _showOverlay(isConnected: true);
         }
         break;
@@ -180,7 +187,7 @@ class _GlobalConnectionNotifierState extends State<GlobalConnectionNotifier> {
 
   @override
   void dispose() {
-    _connectionSubscription.cancel();
+    _unsubscribeConnectionListener();
     appLifecycleObserver.dispose();
     super.dispose();
   }

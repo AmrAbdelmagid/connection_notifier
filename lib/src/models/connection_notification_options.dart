@@ -7,9 +7,6 @@ class ConnectionNotificationOptions {
   /// Alignment of the connection notification, default is [AlignmentDirectional.topCenter].
   final AlignmentGeometry alignment;
 
-  /// To pause listening to changes while app in background, default is [false].
-  final bool pauseConnectionListenerWhenAppInBackground;
-
   /// Height of the connection notification, default is twice top padding.
   final double? height;
 
@@ -108,7 +105,6 @@ class ConnectionNotificationOptions {
 
   const ConnectionNotificationOptions({
     this.alignment = AlignmentDirectional.topCenter,
-    this.pauseConnectionListenerWhenAppInBackground = false,
     this.height,
     this.width,
     this.borderRadius,
