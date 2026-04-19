@@ -72,6 +72,7 @@ class DefaultConnectionNotificationContent extends StatelessWidget {
                   : disconnectedIcon ??
                       const CircularProgressIndicator(
                         valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        strokeWidth: 2,
                       ),
             ),
         ],

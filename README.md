@@ -398,6 +398,81 @@ are required.
 
 ## Migration Guide
 
+### From v3.x to v4.0
+
+**Version 4.0 introduces breaking changes. Please read below.**
+
+#### What's Changed:
+
+1. **Removed `pauseConnectionListenerWhenAppInBackground`** — Background/foreground lifecycle is now managed internally
+2. **Injectable `ConnectionHandler` support** — Bring your own connectivity source
+3. **Automatic, stable reconnect flow** — App pauses in background, resumes with 3s delay in foreground
+
+#### Migration Steps:
+
+**Step 1: Remove `pauseConnectionListenerWhenAppInBackground`**
+
+If you were using this option, simply remove it:
+
+```dart
+// ❌ Before (v3.0):
+GlobalConnectionNotifier(
+  connectionNotificationOptions: ConnectionNotificationOptions(
+    alignment: Alignment.topCenter,
+    pauseConnectionListenerWhenAppInBackground: true, // ← REMOVE THIS
+  ),
+  child: MaterialApp(...),
+)
+
+// ✅ After (v4.0):
+GlobalConnectionNotifier(
+  connectionNotificationOptions: ConnectionNotificationOptions(
+    alignment: Alignment.topCenter,
+    // Background/foreground is handled automatically now
+  ),
+  child: MaterialApp(...),
+)
+```
+
+**Step 2: (Optional) Use custom connectivity source**
+
+New in v4.0: bring your own connectivity handler:
+
+```dart
+class MyCustomHandler implements ConnectionHandler {
+  @override
+  Stream<ConnectionNotifierInternetConnectionStatus> get onStatusChange {
+    // Your custom connectivity source
+    return myCustomConnectivityStream;
+  }
+
+  @override
+  Future<bool> get hasInternetAccess async {
+    // Your custom connectivity check
+    return myCustomCheckInternet();
+  }
+}
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await ConnectionNotifierTools.initialize(
+    connectionHandler: MyCustomHandler(), // ← Inject your handler
+  );
+  runApp(const MyApp());
+}
+```
+
+#### Behavior Changes:
+
+| Behavior | v3.0 | v4.0 |
+|---|---|---|
+| Background handling | Optional, manual via option | Always active, automatic |
+| Resume delay | None | 3 seconds (for OS to settle) |
+| Status deduplication | No | Yes (same status ignored) |
+| Custom connectivity | No | Yes, via `ConnectionHandler` injection |
+
+---
+
 ### From v2.x to v3.0
 
 **See [CHANGELOG.md](CHANGELOG.md) for detailed migration instructions.**
