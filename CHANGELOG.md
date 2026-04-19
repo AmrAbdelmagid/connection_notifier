@@ -1,3 +1,12 @@
+## 4.0.1
+
+### Documentation
+- Added comprehensive migration guide from v3.x to v4.0 in README.md.
+- Updated migration guide to clarify public API changes.
+
+### UI Improvements
+- Increased default disconnect indicator stroke width to 2 for better visibility.
+
 ## 4.0.0
 
 ### New Features
