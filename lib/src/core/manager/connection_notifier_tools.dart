@@ -31,6 +31,14 @@ class ConnectionNotifierTools {
   /// A boolean that has the latest update about the connection status.
   static bool get isConnected => _connectionNotifierManager.isConnected!;
 
+  /// Performs an async live check against the configured [ConnectionHandler]
+  /// and returns `true` if internet access is currently available.
+  ///
+  /// Prefer this over [isConnected] for time-sensitive checks, as [isConnected]
+  /// may briefly hold stale data during a connection change.
+  static Future<bool> get isConnectedAsync =>
+      _connectionNotifierManager.connectionHandler.hasInternetAccess;
+
   /// A broadcast stream that emits on every change in the connection status.
   static Stream<bool> get onStatusChange =>
       _connectionNotifierManager.connection
