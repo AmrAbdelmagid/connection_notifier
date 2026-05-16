@@ -1,3 +1,8 @@
+## 4.1.0
+
+### New Features
+- Added `ConnectionNotifierTools.isConnectedAsync` — an async getter that performs a live connectivity check via the configured `ConnectionHandler` and returns a `Future<bool>`. Useful for time-sensitive checks where `isConnected` may briefly hold stale data during a connection change.
+
 ## 4.0.1
 
 ### Documentation

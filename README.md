@@ -3,6 +3,7 @@
 A simple way to notify your user about the connection status as well as providing simple tools that help tracking the internet connection status.
 
 **Version 4.0+**: Now with injectable connectivity handlers, full **Navigator 2.0 support**, **Web support**, and seamless support for modern routing solutions.
+**Version 4.1+**: Added async connectivity check via `ConnectionNotifierTools.isConnectedAsync`.
 
 ## Gallery
 
@@ -352,8 +353,12 @@ void main() async {
 Then use:
 
 ```dart
-// Check if connected
+// Check if connected (synchronous, last known status)
 bool isConnected = ConnectionNotifierTools.isConnected;
+
+// Async live check — use when you need a guaranteed up-to-date result,
+// since isConnected may briefly hold stale data during a connection change.
+bool isOnline = await ConnectionNotifierTools.isConnectedAsync;
 
 // Listen to connection changes
 ConnectionNotifierTools.onStatusChange.listen((isConnected) {
