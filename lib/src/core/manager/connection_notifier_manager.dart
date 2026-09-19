@@ -1,5 +1,3 @@
-library connection_notifier_manager;
-
 import 'dart:async' show Future, Stream, StreamSubscription;
 
 import 'package:connection_notifier/src/core/internal/connection_handler_impl.dart'

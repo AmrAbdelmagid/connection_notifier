@@ -2,3 +2,15 @@ include: package:flutter_lints/flutter.yaml
 
 # Additional information about this file can be found at
 # https://dart.dev/guides/language/analysis-options
+
+analyzer:
+  exclude:
+    - build/**
+
+linter:
+  rules:
+    # Both are checked by pana when scoring on pub.dev, but are not part of
+    # flutter_lints 2.x. Enabled explicitly rather than by upgrading
+    # flutter_lints, which would require raising the SDK floor to ^3.8.0.
+    - dangling_library_doc_comments
+    - use_string_in_part_of_directives
