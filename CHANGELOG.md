@@ -1,3 +1,14 @@
+## 4.1.1
+
+### Bug Fixes
+- `OverlayAnimation` no longer uses its `AnimationController` after disposal. The status listener checked `mounted` only before awaiting the auto-hide delay, so an overlay dismissed mid-delay called `reverse()` on a disposed ticker and threw. `mounted` is now re-checked after every await.
+- A disposed notification no longer calls `hideOverlay()`, which could close the notification that replaced it.
+- The status listener is removed before the controller is disposed.
+
+### Maintenance
+- Fixed the two analysis hints pana reports (dangling library doc comment, `part of` by library name) and enabled both lints in `analysis_options.yaml`.
+- Removed the duplicated, vestigial `library connection_notifier_manager;` declarations.
+
 ## 4.1.0
 
 ### New Features

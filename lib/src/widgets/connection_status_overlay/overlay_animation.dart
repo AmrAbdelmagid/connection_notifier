@@ -64,8 +64,13 @@ class OverlayAnimation extends StatefulWidget {
 
 class _OverlayAnimationState extends State<OverlayAnimation>
     with SingleTickerProviderStateMixin {
-  late final AnimationController _controller;
-  late final Animation<Offset> _tweenSlideAnimation;
+  /// Null when [OverlayAnimationType.none] is used, in which case no ticker is
+  /// ever created. Nullable rather than `late` so that [dispose] never has to
+  /// re-derive whether a controller exists from the current widget.
+  AnimationController? _controller;
+
+  /// Null for [OverlayAnimationType.fade] and [OverlayAnimationType.none].
+  Animation<Offset>? _tweenSlideAnimation;
 
   @override
   void initState() {
@@ -82,13 +87,16 @@ class _OverlayAnimationState extends State<OverlayAnimation>
                   ? 1.0
                   : 0.0;
 
-      _controller = AnimationController(
+      final controller = AnimationController(
         vsync: this,
         duration: animationDuration,
         reverseDuration: animationDuration,
-      )..forward();
+      );
+      _controller = controller;
 
-      widget.onInitialization(_controller);
+      controller.forward();
+
+      widget.onInitialization(controller);
 
       if (widget.overlayAnimationType != OverlayAnimationType.fade) {
         _tweenSlideAnimation = Tween<Offset>(
@@ -99,68 +107,84 @@ class _OverlayAnimationState extends State<OverlayAnimation>
           end: Offset.zero,
         ).animate(
           CurvedAnimation(
-            parent: _controller,
+            parent: controller,
             curve: animationCurve,
             reverseCurve: animationCurve,
           ),
         );
       }
 
-      _controller.addStatusListener(
-        (status) async {
-          if (mounted) {
-            if (widget.isConnected) {
-              if (status == AnimationStatus.completed) {
-                await Future.delayed(
-                  widget.connectedDuration ?? const Duration(seconds: 2),
-                );
+      controller.addStatusListener(_onAnimationStatusChanged);
+    }
+  }
 
-                await _controller.reverse();
+  /// Auto-hides the notification once it has been on screen long enough.
+  ///
+  /// Every `await` here is a point at which this [State] can be disposed — the
+  /// user navigates away, or a newer connection status replaces this overlay —
+  /// so [mounted] is re-checked after each one. Without that, `reverse()` runs
+  /// against a disposed ticker and `hideOverlay()` closes whichever overlay
+  /// replaced this one.
+  Future<void> _onAnimationStatusChanged(AnimationStatus status) async {
+    if (!mounted) return;
 
-                widget.hideOverlay();
-              }
-            } else {
-              if (widget.disconnectedDuration != null) {
-                await Future.delayed(
-                  widget.disconnectedDuration!,
-                );
-                await _controller.reverse();
-                widget.hideOverlay();
-              }
-            }
-          }
-        },
+    if (widget.isConnected) {
+      if (status != AnimationStatus.completed) return;
+
+      await Future.delayed(
+        widget.connectedDuration ?? const Duration(seconds: 2),
+      );
+    } else {
+      if (widget.disconnectedDuration == null) return;
+
+      await Future.delayed(
+        widget.disconnectedDuration!,
       );
     }
+
+    if (!mounted) return;
+
+    await _controller?.reverse();
+
+    if (!mounted) return;
+
+    widget.hideOverlay();
   }
 
   @override
   void dispose() {
-    if (widget.overlayAnimationType != OverlayAnimationType.none) {
-      _controller.dispose();
-    }
+    _controller?.removeStatusListener(_onAnimationStatusChanged);
+    _controller?.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final AnimationController? controller = _controller;
+    final Animation<Offset>? tweenSlideAnimation = _tweenSlideAnimation;
+
     switch (widget.overlayAnimationType) {
       case OverlayAnimationType.fadeAndSlide:
+        if (controller == null || tweenSlideAnimation == null) {
+          return widget.child;
+        }
         return FadeTransition(
-          opacity: _controller,
+          opacity: controller,
           child: SlideTransition(
-            position: _tweenSlideAnimation,
+            position: tweenSlideAnimation,
             child: widget.child,
           ),
         );
       case OverlayAnimationType.fade:
+        if (controller == null) return widget.child;
         return FadeTransition(
-          opacity: _controller,
+          opacity: controller,
           child: widget.child,
         );
       case OverlayAnimationType.slide:
+        if (tweenSlideAnimation == null) return widget.child;
         return SlideTransition(
-          position: _tweenSlideAnimation,
+          position: tweenSlideAnimation,
           child: widget.child,
         );
       case OverlayAnimationType.none:

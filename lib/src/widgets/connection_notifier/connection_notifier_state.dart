@@ -1,4 +1,4 @@
-part of connection_notifier_manager;
+part of 'connection_notifier.dart';
 
 class _ConnectionNotifierState extends State<ConnectionNotifier> {
   final AppLifecycleObserver appLifecycleObserver = AppLifecycleObserver();
